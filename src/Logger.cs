@@ -19,7 +19,8 @@ internal static class Logger
 
     /// <summary>覆寫 log.txt 去處的環境變數。**唯一的用途是讓自動化測試不要污染使用者的正式 log。**
     ///
-    /// <b>問題</b>：全庫有 74 個 <see cref="Log(string)"/> 呼叫點，而它把去處寫死在
+    /// <b>問題</b>：全庫有 **98 個** <see cref="Log(string)"/> 呼叫點
+    /// （2026-08-12 實測；2026-08-09 定案時是 74），而它把去處寫死在
     /// <see cref="AppDataPaths.Root"/>。任何測試只要走到其中一個就會寫進使用者的正式 log.txt
     /// ——2026-08-09 實測，990 個測試每輪寫 <b>146 bytes</b>，內容是
     /// 「DocumentChangeLog：C:\models\a.rvt 的變動元素超過 100000…」，
@@ -29,8 +30,9 @@ internal static class Logger
     ///
     /// <b>為什麼改在這裡而不是逐個元件</b>：<c>f5c16cc</c> 試過逐個加可選 log 委派
     /// （<c>DebouncedJsonStore</c>／<c>CrossProcessFileLock</c>／<c>MergedJsonWriter</c> 三處），
-    /// 而 <c>DocumentChangeLog</c> 正是後來新增、沒有人記得比照辦理的那一個。74 個呼叫點靠自律
-    /// 逐一補只會再漏第二次；<c>Log</c> 是那 74 個唯一的匯流點，收在這裡一次涵蓋全部。
+    /// 而 <c>DocumentChangeLog</c> 正是後來新增、沒有人記得比照辦理的那一個。近百個呼叫點靠自律
+    /// 逐一補只會再漏第二次——**那個數字三天內從 74 長到 98，本身就是證據**；
+    /// <c>Log</c> 是它們唯一的匯流點，收在這裡一次涵蓋全部。
     ///
     /// <b>為什麼不是覆寫 <see cref="AppDataPaths.Root"/></b>：那會連「路徑長什麼樣」的斷言一起改掉，
     /// 而 <c>StartupBackupTests</c> 刻意寫死真實路徑來釘住「使用者被告知去哪裡找備份」這個對外承諾
