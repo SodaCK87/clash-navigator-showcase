@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 展示用：從 Clash Navigator（Revit 增益集）抽出來的八個零 Revit 相依模組。
+       原專案是 net48 / net8.0-windows 雙目標；這裡只留 net8.0，讓任何人 clone 下來
+       不必裝 Revit、不必開 Windows 桌面就能建置與跑測試。 -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>ClashNavigatorAddin</RootNamespace>
+    <AssemblyName>ClashNavigator.Showcase</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- 這些型別在原專案是 internal，而原專案的測試是把原始檔「連結」進測試組件裡編譯，
+       所以看得到。這裡改成兩個獨立組件（測試以 ProjectReference 參考），就得明講一次。
+       刻意不為了測試把它們改成 public——可見度是設計的一部分，不該被測試安排牽著走。 -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>ClashNavigator.Showcase.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

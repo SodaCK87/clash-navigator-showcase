@@ -1,0 +1,23 @@
+name: build & test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      # 兩個 OS 都跑：這八個模組零 Revit、零 WPF 相依，能在 Linux 上跑完
+      # 正是「把邏輯抽離宿主 API」這件事最直接的證明。
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test tests/ClashNavigator.Showcase.Tests.csproj -c Release --nologo
