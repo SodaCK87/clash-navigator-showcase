@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- 展示用：從 Clash Navigator（Revit 增益集）抽出來的八個零 Revit 相依模組。
+  <!-- 展示用：從 Clash Navigator（Revit 增益集）抽出來的八個零 Revit 相依模組，
+       外加 Logger／AppDataPaths 兩支相依帶進來的支援檔。
        原專案是 net48 / net8.0-windows 雙目標；這裡只留 net8.0，讓任何人 clone 下來
        不必裝 Revit、不必開 Windows 桌面就能建置與跑測試。 -->
   <PropertyGroup>

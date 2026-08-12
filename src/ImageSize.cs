@@ -26,10 +26,15 @@ internal static class ImageSize
             return TryReadPng(reader, ref width, ref height)
                 || TryReadJpeg(reader, ref width, ref height);
         }
-        catch (IOException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
         {
             // 涵蓋 EndOfStreamException（它繼承自 IOException）：檔案被截斷（例如 Revit 匯出
             // 中途失敗）與「格式不認得」同樣處置——回 false 讓呼叫端退回預設尺寸。
+            //
+            // **另外兩個不是 IOException 的子類**，漏掉就會逃出去、讓整份匯出因為一張圖而失敗，
+            // 與上面那句承諾相反：`UnauthorizedAccessException`（權限不足，或路徑其實是個目錄）
+            // 繼承的是 `SystemException`；`ArgumentException` 則來自空字串／含非法字元的路徑
+            // ——截圖的路徑是程式組出來的，但快取目錄可以被使用者手動動過。
             return false;
         }
     }

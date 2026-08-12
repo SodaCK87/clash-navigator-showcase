@@ -19,7 +19,7 @@
 
 ## 這個 repo 是什麼
 
-**這是展示用的節錄，不是完整的增益集。** 完整專案有 21,133 行、依賴 Revit API 才能編譯。
+**這是展示用的節錄，不是完整的增益集。** 完整專案有 21,404 行（不計空白行）、依賴 Revit API 才能編譯。
 這裡挑出**八個零 Revit 相依、可以獨立建置與跑測試**的模組，
 加上開發過程中幾個值得講的決策與量測。
 
@@ -27,9 +27,9 @@
 dotnet test tests/ClashNavigator.Showcase.Tests.csproj
 ```
 
-→ **128 passed**，0 warning（兩個專案都開 `TreatWarningsAsErrors`）。不需要 Revit。
+→ **141 passed**，0 warning（兩個專案都開 `TreatWarningsAsErrors`）。不需要 Revit。
 
-CI 在 Windows 與 Linux 上都跑：Windows 128 個全過，**Linux 127 個過、1 個跳過**。
+CI 在 Windows 與 Linux 上都跑：Windows 141 個全過，**Linux 140 個過、1 個跳過**。
 跳過的那個斷言「目標檔唯讀時寫入要擲例外」——Windows 的 `ReadOnly` 屬性會擋下取代，
 而 POSIX 管的是**目錄**權限，檔案自己沒有寫入權仍可被 rename 蓋過去。宿主是 Revit、只跑在 Windows，
 所以斷言的就是 Windows 的行為，Linux 上跳過它，**而不是把斷言放寬到兩邊都成立**——那會變成什麼都沒驗到。
@@ -45,10 +45,16 @@ CI 在 Windows 與 Linux 上都跑：Windows 128 個全過，**Linux 127 個過�
 | [`ImageSize.cs`](src/ImageSize.cs) | 108 | 從 JPEG／PNG 檔頭讀像素尺寸，不引 `System.Drawing` |
 | [`ClashFocusRegion.cs`](src/ClashFocusRegion.cs) | 98 | 逐軸取「重疊區間／最接近的那道縫」，決定截圖取景框 |
 
-每一個都有對應的測試在 [`tests/`](tests/)。
+每一個都有對應的測試在 [`tests/`](tests/)。另有兩支是相依帶進來的：
+[`Logger.cs`](src/Logger.cs)（`AtomicFile` 掃殘檔時會記錄失敗，8 個測試一併節錄）與
+[`AppDataPaths.cs`](src/AppDataPaths.cs)（19 行的路徑組合，沒有單獨的測試）。
 
 **不在這裡的**：WPF 面板與三個對話框、`IExternalCommand` 進入點、以及所有碰 `Autodesk.Revit.DB`
 的服務層——它們需要 Revit 才能編譯。
+
+**註解裡的內部參照也一併留著**（`AppSettings`、`ClashCaptureCache`、`ClashExportService.CsvEscape`、
+`CONVENTIONS.md` 的節號、commit hash……），它們指向完整專案，在這個節錄裡查不到。
+刻意不改寫成通用說法：那些註解記的是**當時為什麼那樣決定**，把出處拿掉就只剩結論了。
 
 ---
 
@@ -57,7 +63,7 @@ CI 在 Windows 與 Linux 上都跑：Windows 128 個全過，**Linux 127 個過�
 | | |
 | --- | --- |
 | 開發期間 | 2026-07-08 起，約五週，363 commits |
-| 主程式 | 111 個 `.cs` ＋ 9 份 XAML，21,133 行 |
+| 主程式 | 112 個 `.cs` ＋ 9 份 XAML，21,404 行（`.cs` 不計空白行） |
 | 測試 | 1,092 個離線單元測試 ＋ 14 個必須在 Revit 行程內跑的測試 |
 | 支援版本 | Revit 2018–2026（`net48` ／ `net8.0-windows` 雙目標） |
 | 提交前把關 | 一支腳本 24 項，約 30 秒 |

@@ -56,7 +56,7 @@ internal sealed class ClashHighlightPlan
     /// <summary>「非碰撞元素」是否套用半色調（Revit 的 Halftone，即UI 上叫「淡化」）。</summary>
     public bool OtherHalftone { get; }
 
-    /// <summary>碰撞元素 A／B 的表面透明度（0~<see cref="AppSettings.MaxClashTransparencyPercent"/>）。
+    /// <summary>碰撞元素 A／B 的表面透明度（0~<see cref="MaxClashTransparencyPercent"/>）。
     /// 讓前面那個透出後面那個的**輪廓**，答出「誰在前誰在後」——**不是**靠重疊區混色
     /// （2026-08-08 實測更正，混色像素反而是減少的；數字見
     /// <c>Services\AppSettings.ClashTransparencyPercent</c>）。</summary>

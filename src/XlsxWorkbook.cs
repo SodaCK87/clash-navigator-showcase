@@ -124,7 +124,11 @@ internal sealed class XlsxSheet
     public bool AutoFilter { get; set; }
 
     /// <summary>工作表名稱的合法化：Excel 限 31 字元且不接受 <c>[ ] : * ? / \</c>。
-    /// 違反時 Excel 會判定檔案損毀並要求修復，而不是溫和地忽略。</summary>
+    /// 違反時 Excel 會判定檔案損毀並要求修復，而不是溫和地忽略。
+    ///
+    /// **唯一性不在這裡處理**：清理是逐張各自進行的，看不到別張叫什麼，
+    /// 而截斷與字元替換本身就可能製造出重複。整份的唯一性由
+    /// <see cref="XlsxWorkbook.Write(Stream, IReadOnlyList{XlsxSheet})"/> 把關。</summary>
     private static string SanitizeSheetName(string name)
     {
         var text = new StringBuilder();
@@ -168,6 +172,19 @@ internal static class XlsxWorkbook
     {
         if (sheets.Count == 0)
             throw new ArgumentException("活頁簿至少要有一張工作表。", nameof(sheets));
+
+        // 名稱重複的工作表會讓 Excel 判定檔案損毀（**修復的結果是整份樣式與繪圖被丟掉**，
+        // 而它不會說是哪裡壞的）。**擋在這裡而不是自動改名**：改名等於默默給出一張
+        // 「名字跟呼叫端以為的不一樣」的表，而呼叫端往往就是靠名字去對欄位的。
+        // 比對不分大小寫——Excel 的工作表名稱唯一性就是不分大小寫的。
+        // 注意衝突可能是 SanitizeSheetName 造出來的（31 字元截斷、非法字元換成底線），
+        // 所以要比對**清理後**的 Name，不是呼叫端給的原字串。
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var sheet in sheets)
+        {
+            if (!names.Add(sheet.Name))
+                throw new ArgumentException($"工作表名稱重複：「{sheet.Name}」。", nameof(sheets));
+        }
 
         // leaveOpen: 串流的生命週期歸呼叫端管（測試要在寫完後繼續讀）。
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);

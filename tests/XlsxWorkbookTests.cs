@@ -286,6 +286,31 @@ public class XlsxWorkbookTests
         Assert.Throws<ArgumentException>(() => XlsxWorkbook.Write(stream, Array.Empty<XlsxSheet>()));
     }
 
+    /// <summary>名稱重複的工作表會讓 Excel 判定檔案損毀，而修復的結果是樣式與繪圖整批被丟掉
+    /// ——**寫得出來、開得起來、內容不對**，正是這個寫入器最該擋在門口的那一類。
+    /// 比對不分大小寫，Excel 的工作表名稱唯一性就是不分大小寫的。</summary>
+    [Theory]
+    [InlineData("資料", "資料")]
+    [InlineData("Data", "DATA")]
+    public void Write_DuplicateSheetNames_Throws(string first, string second)
+    {
+        using var stream = new MemoryStream();
+        Assert.Throws<ArgumentException>(() =>
+            XlsxWorkbook.Write(stream, new[] { new XlsxSheet(first), new XlsxSheet(second) }));
+    }
+
+    /// <summary>衝突可能是**清理造出來的**：兩個不同的原字串各自被截成 31 字元後撞在一起。
+    /// 所以唯一性要比對清理後的 <c>Name</c>，不是呼叫端給的原字串。</summary>
+    [Fact]
+    public void Write_NamesCollidingOnlyAfterSanitizing_Throws()
+    {
+        var prefix = new string('長', 31);
+        using var stream = new MemoryStream();
+
+        Assert.Throws<ArgumentException>(() =>
+            XlsxWorkbook.Write(stream, new[] { new XlsxSheet(prefix + "A"), new XlsxSheet(prefix + "B") }));
+    }
+
     /// <summary>styles.xml 的 fills 前兩項是 OOXML 的硬性規定（none、gray125）；
     /// 少了會讓 Excel 判定需要修復，而修復的結果是所有樣式被丟掉。</summary>
     [Fact]

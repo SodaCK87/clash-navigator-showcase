@@ -138,4 +138,21 @@ public class ImageSizeTests
         var path = Path.Combine(Path.GetTempPath(), "imagesize_missing_" + Guid.NewGuid().ToString("N"));
         Assert.False(ImageSize.TryRead(path, out _, out _));
     }
+
+    /// <summary>路徑其實是個目錄時 <c>File.OpenRead</c> 擲的是 <c>UnauthorizedAccessException</c>，
+    /// 而它**不繼承 <c>IOException</c>**（繼承的是 <c>SystemException</c>）——只 catch IOException
+    /// 會讓它逃出去、因為一張圖讓整份匯出失敗，與這支方法承諾的相反。
+    /// 權限不足走的是同一個例外型別，但那個沒辦法在 CI 上決定性地造出來。</summary>
+    [Fact]
+    public void TryRead_PathIsADirectory_ReturnsFalseInsteadOfThrowing()
+    {
+        Assert.False(ImageSize.TryRead(Path.GetTempPath(), out _, out _));
+    }
+
+    /// <summary>空字串／含非法字元的路徑擲的是 <c>ArgumentException</c>，同樣不是 IOException。</summary>
+    [Fact]
+    public void TryRead_InvalidPath_ReturnsFalseInsteadOfThrowing()
+    {
+        Assert.False(ImageSize.TryRead(string.Empty, out _, out _));
+    }
 }
