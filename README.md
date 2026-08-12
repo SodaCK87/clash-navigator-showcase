@@ -20,7 +20,12 @@
 dotnet test tests/ClashNavigator.Showcase.Tests.csproj
 ```
 
-→ **128 passed**，0 warning（兩個專案都開 `TreatWarningsAsErrors`）。不需要 Revit，也不需要 Windows。
+→ **128 passed**，0 warning（兩個專案都開 `TreatWarningsAsErrors`）。不需要 Revit。
+
+CI 在 Windows 與 Linux 上都跑：Windows 128 個全過，**Linux 127 個過、1 個跳過**。
+跳過的那個斷言「目標檔唯讀時寫入要擲例外」——Windows 的 `ReadOnly` 屬性會擋下取代，
+而 POSIX 管的是**目錄**權限，檔案自己沒有寫入權仍可被 rename 蓋過去。宿主是 Revit、只跑在 Windows，
+所以斷言的就是 Windows 的行為，Linux 上跳過它，**而不是把斷言放寬到兩邊都成立**——那會變成什麼都沒驗到。
 
 | 模組 | 行數 | 在做什麼 |
 | --- | ---: | --- |

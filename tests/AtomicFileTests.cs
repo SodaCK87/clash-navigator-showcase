@@ -218,14 +218,17 @@ public sealed class AtomicFileTests : IDisposable
         Assert.False(File.Exists(tmp)); // 子目錄內也清得到
     }
 
-    /// <summary>目標檔唯讀（REVIT-CHECKLIST 第 6 段 E1／E2 那一項的實際成因）：
+    /// <summary>目標檔唯讀（使用者實際回報過的失敗成因）：
     /// Replace 被擋、回退的 Delete 同樣被擋，例外要向上傳遞讓呼叫端說得出口。
     ///
     /// **與既有案例的差別、也是本案例存在的理由**：其餘失敗案例都用「拿目錄佔住目標路徑」驅動，
     /// 機制相同但那不是使用者會遇到的形狀，而且**它的例外訊息指向的不是目標檔**。
     /// 唯讀屬性下訊息才會指名目標檔——使用者要拿那個路徑去檔案總管把唯讀取消掉。
-    /// 訊息本身的語言隨執行時期而異（2026-08-04 實測：net48 中文、net8 英文），故只斷言它帶得出路徑。</summary>
-    [Fact]
+    /// 訊息本身的語言隨執行時期而異（2026-08-04 實測：net48 中文、net8 英文），故只斷言它帶得出路徑。
+    ///
+    /// <b>Windows 限定</b>：POSIX 的唯讀是目錄權限的事，檔案沒有寫入權仍可被 rename 蓋過去，
+    /// 所以這個案例在 Linux 上不成立——理由寫在 <see cref="WindowsOnlyFactAttribute"/>。</summary>
+    [WindowsOnlyFact]
     public void WriteAllText_ReadOnlyTarget_Throws_AndNamesTargetNotTemp()
     {
         var path = PathIn("readonly.json");
