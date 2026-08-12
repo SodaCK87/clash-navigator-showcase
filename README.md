@@ -2,6 +2,11 @@
 
 [![build & test](https://github.com/SodaCK87/clash-navigator-showcase/actions/workflows/ci.yml/badge.svg)](https://github.com/SodaCK87/clash-navigator-showcase/actions/workflows/ci.yml)
 
+> **產出方式：本專案是與 Anthropic 的 Claude（Claude Code）協作開發的。**
+> 需求界定、技術取捨與驗收由我把關，Claude 參與實作、測試撰寫與文件整理。
+> README 裡的每一組數字都來自實機量測，不是估算——包括那些**推翻我自己判斷**的量測結果
+> （見〈先量再改〉一節）。
+
 把 BIM 碰撞檢討從「開兩台螢幕互相比對」變成一份追得下去的清單。
 讀 Revit 干涉報告或 Navisworks XML，也能不靠報告直接在模型上檢測；點一筆就選取兩個元素、
 切到專用工作視圖、自動取到看得見的角度，處理狀態與備註留得住，最後匯出成 Excel。
