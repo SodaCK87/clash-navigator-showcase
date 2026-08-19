@@ -27,7 +27,7 @@
   4. [沒有測試環境，就自己造一個](#4-沒有測試環境就自己造一個) — 抽離、離線探針、Revit 內測試三層
   5. [一份程式碼，九個 Revit 版本](#5-一份程式碼九個-revit-版本) — 用工具逐一比對 API 成員
 - [其他畫面](#其他畫面)
-- [授權](#授權)
+- [授權與索取](#授權與索取) — 完整程式碼不公開，量測數據與測試全開
 
 ---
 
@@ -36,8 +36,8 @@
 **這是展示用的節錄，不是完整的增益集。**
 
 - **這裡有**：八個零 Revit 相依、可以獨立建置與跑測試的模組，加上開發過程中幾個值得講的決策與量測。
-- **這裡沒有**：WPF 面板與三個對話框、`IExternalCommand` 進入點、所有碰 `Autodesk.Revit.DB` 的服務層——它們需要 Revit 才能編譯。
-- **完整專案**：21,404 行（不計空白行），依賴 Revit API 才能編譯。
+- **這裡沒有**：WPF 面板與三個對話框、`IExternalCommand` 進入點、所有碰 `Autodesk.Revit.DB` 的服務層——它們需要 Revit 才能編譯，也不公開。
+- **完整專案**：21,404 行（不計空白行），依賴 Revit API 才能編譯。程式碼不公開，需要閱覽請[聯絡索取](#授權與索取)；README 裡的量測數據與這個節錄的測試不設限。
 
 ```bash
 dotnet test tests/ClashNavigator.Showcase.Tests.csproj
@@ -56,13 +56,13 @@ dotnet test tests/ClashNavigator.Showcase.Tests.csproj
 
 | 模組 | 行數 | 在做什麼 |
 | --- | ---: | --- |
-| [`XlsxWorkbook.cs`](src/XlsxWorkbook.cs) | 748 | 零相依的 xlsx 寫入器：`ZipArchive` ＋ 手寫 XML，支援錨定圖片、凍結窗格、自動篩選、儲存格樣式 |
+| [`XlsxWorkbook.cs`](src/XlsxWorkbook.cs) | 765 | 零相依的 xlsx 寫入器：`ZipArchive` ＋ 手寫 XML，支援錨定圖片、凍結窗格、自動篩選、儲存格樣式 |
 | [`MeshProximityUtil.cs`](src/MeshProximityUtil.cs) | 461 | 三角網格間距判定（點-三角形／邊-邊距離） |
 | [`ClashHighlightPlan.cs`](src/ClashHighlightPlan.cs) | 194 | 四個顯示設定之間的互斥規則，抽成純函式 |
 | [`BoundingBoxPairFinder.cs`](src/BoundingBoxPairFinder.cs) | 185 | AABB 排序—掃描粗篩，掃描軸依資料分布自適應 |
 | [`AtomicFile.cs`](src/AtomicFile.cs) | 158 | 原子寫入（暫存檔→替換）與損毀檔備份 |
 | [`ClashCaptureDirection.cs`](src/ClashCaptureDirection.cs) | 142 | 十一個截圖視角的純資料模型 |
-| [`ImageSize.cs`](src/ImageSize.cs) | 108 | 從 JPEG／PNG 檔頭讀像素尺寸，不引 `System.Drawing` |
+| [`ImageSize.cs`](src/ImageSize.cs) | 113 | 從 JPEG／PNG 檔頭讀像素尺寸，不引 `System.Drawing` |
 | [`ClashFocusRegion.cs`](src/ClashFocusRegion.cs) | 98 | 逐軸取「重疊區間／最接近的那道縫」，決定截圖取景框 |
 
 每一個都有對應的測試在 [`tests/`](tests/)。另有兩支是相依帶進來的：
@@ -191,6 +191,13 @@ Revit API 只能在 Revit 行程內執行，一般的測試框架載不起來。
 
 ---
 
-## 授權
+## 授權與索取
 
-原始碼僅供閱覽與評估，未授權重製或再散布。
+這個 repo 裡的原始碼僅供閱覽與評估，未授權重製或再散布。
+
+**完整專案的程式碼不公開。** 需要閱覽的話，請在本 repo 開一則 Issue，或從 GitHub 個人資料頁聯絡我，
+依用途個別提供。
+
+不設限的是**量測數據與驗證方式**——README 裡的每一組數字、每一段「怎麼驗的」都寫在明處，
+節錄的八個模組連同它們的測試也全文公開，clone 下來就能自己跑一次。
+數字要能被檢查才算數，這部分沒有保留的道理。
